@@ -25,7 +25,9 @@
     "license": "MIT",
     "icon": "icon.png",
     "activationEvents": [
-        "*"
+        "onWebviewPanel:petCoding",
+        "onView:petsView",
+        "onCommand:vscode-pets.start"
     ],
     "main": "./out/extension/extension.js",
     "contributes": {
