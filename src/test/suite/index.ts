@@ -49,7 +49,11 @@ export async function run(): Promise<void> {
 
             try {
                 // Run the mocha test
-                mocha.run((failures) => {
+                mocha.run(async (failures) => {
+                    if (nyc) {
+                        nyc.writeCoverageFile();
+                        await nyc.report();
+                    }
                     if (failures > 0) {
                         e(new Error(`${failures} tests failed.`));
                     } else {
@@ -59,11 +63,6 @@ export async function run(): Promise<void> {
             } catch (err) {
                 console.error(err);
                 e(err);
-            } finally {
-                if (nyc) {
-                    nyc.writeCoverageFile();
-                    await nyc.report();
-                }
             }
         });
     });

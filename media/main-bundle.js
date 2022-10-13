@@ -407,7 +407,7 @@ exports.randomName = randomName;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.petPanelApp = exports.saveState = exports.allPets = void 0;
+exports.petPanelApp = exports.saveState = exports.addPetToPanel = exports.allPets = void 0;
 // This script will be run within the webview itself
 const names_1 = __webpack_require__(/*! ../common/names */ "./src/common/names.ts");
 const pets_1 = __webpack_require__(/*! ./pets */ "./src/panel/pets.ts");
@@ -518,6 +518,7 @@ function addPetToPanel(petType, basePetUri, petColor, petSize, left, bottom, flo
     }
     return new pets_1.PetElement(petSpriteElement, collisionElement, speechBubbleElement, newPet, petColor, petType);
 }
+exports.addPetToPanel = addPetToPanel;
 function saveState(stateApi) {
     if (!stateApi) {
         stateApi = window.acquireVsCodeApi();
@@ -963,7 +964,7 @@ class BasePetType {
         this.repositionAccompanyingElements();
     }
     width() {
-        return this.el.width;
+        return this.el.width ? this.el.width : calculateSpriteWidth(this._size);
     }
     floor() {
         return this._floor;

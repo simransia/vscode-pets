@@ -285,7 +285,7 @@ abstract class BasePetType implements IPetType {
     }
 
     width(): number {
-        return this.el.width;
+        return this.el.width ? this.el.width : calculateSpriteWidth(this._size);
     }
 
     floor(): number {

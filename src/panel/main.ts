@@ -115,7 +115,7 @@ function startAnimations(
     }, 100);
 }
 
-function addPetToPanel(
+export function addPetToPanel(
     petType: PetType,
     basePetUri: string,
     petColor: PetColor,
