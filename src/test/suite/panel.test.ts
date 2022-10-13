@@ -11,7 +11,6 @@ import {
     ColorThemeKind,
     WebviewMessage,
     ALL_PETS,
-    ALL_COLORS,
     ALL_SCALES,
 } from '../../common/types';
 import { PetElementState, PetPanelState, States } from '../../panel/states';
@@ -121,73 +120,81 @@ suite('Pets Test Suite', () => {
         assert.strictEqual(collection.locate('Jerry'), undefined);
     });
 
-    ALL_SCALES.forEach((petSize) => {
-        ALL_COLORS.forEach((petColor) => {
-            ALL_PETS.forEach((petType) => {
-                test(`Test panel app initialization with theme and ${petSize} ${petColor} ${petType}`, () => {
-                    const mockState = new MockState();
-                    panel.allPets.reset();
-                    mockState.reset();
-                    panel.petPanelApp(
-                        baseUrl,
-                        Theme.beach,
-                        ColorThemeKind.dark,
-                        petColor,
-                        petSize,
-                        petType,
-                        mockState,
-                    );
-
-                    assert.notStrictEqual(
-                        document.body.style.backgroundImage,
-                        '',
-                    );
-                    assert.notStrictEqual(
-                        document.getElementById('foreground')?.style
-                            .backgroundImage,
-                        '',
-                    );
-
-                    assert.equal(mockState.getState()?.petStates?.length, 1);
-
-                    const firstPet: PetElementState = (mockState.getState()
-                        ?.petStates ?? [])[0];
-                    assert.equal(firstPet.petType, petType);
-                    assert.equal(firstPet.petColor, petColor);
-
-                    const createdPets = panel.allPets.pets();
-                    assert.notEqual(createdPets.at(0), undefined);
-                    const pet = createdPets.at(0);
-                    assert.equal(pet?.color, petColor);
-                    assert.equal(pet?.type, petType);
-                    assert.notEqual(pet?.pet.width(), 0);
-
-                    /// Cycle 1000 frames
-                    for (var i = 0; i < 1000; i++) {
-                        pet?.pet.nextFrame();
-                        assert.equal(panel.allPets.seekNewFriends().length, 0);
-                        assert.notEqual(pet?.pet.getState(), undefined);
-                    }
-
-                    // Test swipe
-                    if (pet?.pet.canSwipe) {
-                        pet?.pet.swipe();
-                        assert.equal(
-                            pet?.pet.getState().currentStateEnum,
-                            States.swipe,
+    [Theme.forest, Theme.castle, Theme.beach].forEach((theme) => {
+        ALL_SCALES.forEach((petSize) => {
+            [PetColor.black, PetColor.brown].forEach((petColor) => {
+                ALL_PETS.forEach((petType) => {
+                    test(`Test panel app initialization with ${theme} and ${petSize} ${petColor} ${petType}`, () => {
+                        const mockState = new MockState();
+                        panel.allPets.reset();
+                        mockState.reset();
+                        panel.petPanelApp(
+                            baseUrl,
+                            theme,
+                            ColorThemeKind.dark,
+                            petColor,
+                            petSize,
+                            petType,
+                            mockState,
                         );
-                        assert.notEqual(pet?.speech.innerText, '');
-                        assert.equal(pet?.speech.style.display, 'block');
+
+                        assert.notStrictEqual(
+                            document.body.style.backgroundImage,
+                            '',
+                        );
+                        assert.notStrictEqual(
+                            document.getElementById('foreground')?.style
+                                .backgroundImage,
+                            '',
+                        );
+
+                        assert.equal(
+                            mockState.getState()?.petStates?.length,
+                            1,
+                        );
+
+                        const firstPet: PetElementState = (mockState.getState()
+                            ?.petStates ?? [])[0];
+                        assert.equal(firstPet.petType, petType);
+                        assert.equal(firstPet.petColor, petColor);
+
+                        const createdPets = panel.allPets.pets();
+                        assert.notEqual(createdPets.at(0), undefined);
+                        const pet = createdPets.at(0);
+                        assert.equal(pet?.color, petColor);
+                        assert.equal(pet?.type, petType);
+                        assert.notEqual(pet?.pet.width(), 0);
+
+                        /// Cycle 1000 frames
                         for (var i = 0; i < 1000; i++) {
                             pet?.pet.nextFrame();
+                            assert.equal(
+                                panel.allPets.seekNewFriends().length,
+                                0,
+                            );
+                            assert.notEqual(pet?.pet.getState(), undefined);
                         }
-                        // Check leaves swipe state
-                        assert.notEqual(pet?.pet.getState(), States.swipe);
-                    }
 
-                    // Test hello
-                    assert.notStrictEqual(pet?.pet.hello(), undefined);
-                    assert.notStrictEqual(pet?.pet.hello(), '');
+                        // Test swipe
+                        if (pet?.pet.canSwipe) {
+                            pet?.pet.swipe();
+                            assert.equal(
+                                pet?.pet.getState().currentStateEnum,
+                                States.swipe,
+                            );
+                            assert.notEqual(pet?.speech.innerText, '');
+                            assert.equal(pet?.speech.style.display, 'block');
+                            for (var i = 0; i < 1000; i++) {
+                                pet?.pet.nextFrame();
+                            }
+                            // Check leaves swipe state
+                            assert.notEqual(pet?.pet.getState(), States.swipe);
+                        }
+
+                        // Test hello
+                        assert.notStrictEqual(pet?.pet.hello(), undefined);
+                        assert.notStrictEqual(pet?.pet.hello(), '');
+                    });
                 });
             });
         });
@@ -237,12 +244,9 @@ suite('Pets Test Suite', () => {
                 break;
             }
         }
-        assert.equal(createdPets[0].pet.hasFriend(), true);
-        assert.notEqual(createdPets[0].pet.friend(), undefined);
-        assert.equal(createdPets[0].pet.friend()?.name(), 'Smithy');
         assert.equal(createdPets[1].pet.hasFriend(), true);
         assert.notEqual(createdPets[1].pet.friend(), undefined);
-        assert.equal(createdPets[0].pet.friend()?.name(), firstPetName);
+        assert.equal(createdPets[1].pet.friend()?.name(), firstPetName);
     });
 
     test('Test panel app initialization with no theme', () => {
